@@ -14,6 +14,11 @@ use Tymon\JWTAuth\Facades\JWTAuth;
  */
 class AuthController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('jwt', ['except' => ['login']]);
+    }
+    
     /**
      * @param LoginRequest $request
      * @return UserResource|\Illuminate\Http\JsonResponse
@@ -25,10 +30,18 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         JWTAuth::setToken($token);
-        $user = new UserResource(JWTAuth::authenticate());
-        return (new UserResource($user))->additional([
+        return (new UserResource(JWTAuth::authenticate()))->additional([
             'access_token' => $token,
             'token_type'   => 'Bearer',
         ]);
+    }
+    
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout()
+    {
+        auth()->logout();
+        return response()->json(['message' => 'Successfully logged out']);
     }
 }
