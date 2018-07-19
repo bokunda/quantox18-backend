@@ -17,7 +17,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::group(['prefix' => 'v1'], function () {
     Route::post('/login', 'Auth\Api\AuthController@login')->name('login.api');
-    Route::post('/register', 'Auth\Api\RegisterController@register')->name('register.api');
+    Route::post('/register', 'Auth\Api\AuthController@register')->name('register.api');
     Route::group(['prefix' => 'auth', 'middleware' => 'jwt'], function () {
         Route::get('/logout', 'Auth\Api\AuthController@logout')->name('logout.api');
     });

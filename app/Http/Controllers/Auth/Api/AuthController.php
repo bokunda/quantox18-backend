@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Auth\Api;
 
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
-use Illuminate\Http\Request;
+use App\User;
 use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -15,28 +16,26 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class AuthController extends Controller
 {
     /**
-     * AuthController constructor.
-     */
-    public function __construct()
-    {
-        $this->middleware('jwt', ['except' => ['login']]);
-    }
-    
-    /**
      * @param LoginRequest $request
-     * @return UserResource|\Illuminate\Http\JsonResponse
+     * @return array|\Illuminate\Http\Request|string
      */
     public function login(LoginRequest $request)
     {
-        $credentials = request(['email', 'password']);
-        if (!$token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-        JWTAuth::setToken($token);
-        return (new UserResource(JWTAuth::authenticate()))->additional([
-            'access_token' => $token,
-            'token_type'   => 'Bearer',
-        ]);
+        $credentials = $this->AuthService()->login();
+        
+        return $credentials;
+    }
+    
+    /**
+     * @param RegisterRequest $request
+     * @param User $user
+     * @return array|\Illuminate\Http\Request|string
+     */
+    public function register(RegisterRequest $request, User $user)
+    {
+        $credentials = $this->AuthService()->register($request, $user);
+        
+        return $credentials;
     }
     
     /**
