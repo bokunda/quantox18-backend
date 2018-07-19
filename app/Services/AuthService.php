@@ -24,7 +24,6 @@ class AuthService
         $user->password = bcrypt($request->password);
         $user->save();
         $credentials = request(['email', 'password']);
-        
         if (!$token = auth()->attempt($credentials)) {
             return response()->json([
                 'error' => 'Please check your details'
@@ -34,7 +33,6 @@ class AuthService
             'access_token' => $token,
             'token_type'   => 'Bearer',
         ]);
-
     }
     
     /**
@@ -43,7 +41,6 @@ class AuthService
     public function login()
     {
         $credentials = request(['email', 'password']);
-    
         if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }

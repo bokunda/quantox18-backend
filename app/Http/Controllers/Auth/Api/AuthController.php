@@ -22,7 +22,6 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $credentials = $this->AuthService()->login();
-        
         return $credentials;
     }
     
@@ -34,7 +33,6 @@ class AuthController extends Controller
     public function register(RegisterRequest $request, User $user)
     {
         $credentials = $this->AuthService()->register($request, $user);
-        
         return $credentials;
     }
     
