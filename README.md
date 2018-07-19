@@ -1,27 +1,27 @@
-## Initialization
+# Initialization
 
-####Git clone
+###Git clone
 ```
 git clone https://github.com/bokunda/quantox18-backend
 ```
 
-####Change working directory
+###Change working directory
 ```
 cd quantox18-backend
 ```
-####Env file
+###Env file
 ```
 cp .env.example .env
 ```
-####Composer update
+###Composer update
 ```
 composer update
 ```
-####Generate Laravel key
+###Generate Laravel key
 ```
 php artisan key:generate
 ```
-####Setup database
+###Setup database
 ```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -30,7 +30,7 @@ DB_DATABASE=database
 DB_USERNAME=username
 DB_PASSWORD=password
 ```
-####Migration
+###Migration
 ```
 php artisan migrate --seed
 ```
@@ -41,11 +41,11 @@ php artisan migrate --seed
 ```
 composer require tymon/jwt-auth:1.0.0
 ```
-####Publish files
+###Publish files
 ```
 php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
 ```
-####Generate JWT secret code
+###Generate JWT secret code
 ```
 php artisan jwt:secret
 ```
