@@ -35,9 +35,9 @@ DB_PASSWORD=password
 php artisan migrate --seed
 ```
 
-## JWT installation
+# JWT installation
 
-#### Install 
+### Install 
 ```
 composer require tymon/jwt-auth:1.0.0
 ```
