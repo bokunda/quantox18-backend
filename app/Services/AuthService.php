@@ -32,7 +32,6 @@ class AuthService
         return (new UserResource($user))->additional([
             'access_token' => $token,
             'token_type'   => 'Bearer',
-            'expires_in' => auth()->factory()->getTTL() * 120
         ]);
     }
     
@@ -49,7 +48,6 @@ class AuthService
         return (new UserResource(JWTAuth::authenticate()))->additional([
             'access_token' => $token,
             'token_type'   => 'Bearer',
-            'expires_in' => auth()->factory()->getTTL() * 120
         ]);
     }
 }

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Http\Resources\UsersResource;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\User;
 use Illuminate\Http\Request;
 
@@ -12,6 +13,6 @@ class HomeController extends Controller
     {
         $users = User::where('id', '!=', $request->user()->id)->get();
         
-        return UsersResource::collection($users);
+        return UserResource::collection($users);
     }
 }

@@ -15,15 +15,10 @@ class CreateGameTable extends Migration
     {
         Schema::create('games', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('location_1')->nullable();
-            $table->string('location_2')->nullable();
-            $table->string('location_3')->nullable();
-            $table->string('location_4')->nullable();
-            $table->string('location_5')->nullable();
-            $table->string('location_6')->nullable();
-            $table->string('location_7')->nullable();
-            $table->string('location_8')->nullable();
-            $table->string('location_9')->nullable();
+            $table->integer('user_one')->nullable();
+            $table->integer('user_two')->nullable();
+            $table->boolean('user_two_accepted')->default(false);
+            $table->integer('winner')->nullable();
             $table->timestamps();
         });
     }

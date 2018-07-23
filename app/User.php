@@ -2,6 +2,7 @@
 
 namespace App;
 
+use http\Env\Request;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -51,5 +52,38 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+    
+    public function canPlay($game_id)
+    {
+        $take = Takes::where('game_id', $game_id)->orderBy('id', 'desc')->first();
+        $game = Game::find($game_id);
+        
+        if ($take != null) {
+            if ($take->next_turn == $this->id) {
+                return true;
+            }
+            return false;
+        }
+        
+        if ($game->user_one != $this->id) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    public function takeExists($location, $game_id)
+    {
+        $take = Takes::where('game_id', $game_id)->pluck('location')->toArray();
+        
+        if (in_array($location, $take)) {
+            return false;
+        }
+        
+        if ($location > 9) {
+            return false;
+        }
+        return true;
     }
 }

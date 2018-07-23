@@ -16,13 +16,14 @@ class CreateTakesTable extends Migration
         Schema::create('takes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('game_id');
-            $table->integer('user_one');
-            $table->integer('user_two');
-            $table->boolean('user_two_accepted')->default(false);
-            $table->integer('winner')->nullable();
+            $table->integer('user_id');
+            $table->integer('location');
+            $table->integer('next_turn');
+            
             $table->timestamps();
     
-            $table->foreign('game_id')->references('id')->on('games')->ondelete('cascade');
+            $table->foreign('game_id')->references('id')->on('games')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

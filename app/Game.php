@@ -8,8 +8,13 @@ class Game extends Model
 {
     protected $table = 'games';
     
+    protected $fillable = [
+        'started',
+        'user_two_accepted'
+    ];
+    
     public function takes()
     {
-        return $this->belongsToMany(Takes::class, 'id');
+        return $this->belongsToMany(User::class, 'takes')->withPivot('location', 'next_turn');
     }
 }
