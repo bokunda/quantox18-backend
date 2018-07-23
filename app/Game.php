@@ -10,6 +10,6 @@ class Game extends Model
     
     public function takes()
     {
-        return $this->belongsTo(Takes::class, 'id');
+        return $this->belongsToMany(Takes::class, 'id');
     }
 }
