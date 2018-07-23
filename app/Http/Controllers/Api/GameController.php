@@ -21,6 +21,28 @@ class GameController extends Controller
     public function game($game_id)
     {
         $game = Game::find($game_id);
+        if ($game->takes->count() == 9) {
+            $winnings = [
+              [1,2,3],
+              [4,5,6],
+              [7,8,9],
+              [1,4,7],
+              [3,6,9],
+              [1,5,9],
+              [7,5,3],
+            ];
+            $takesByUser = $game->takes()->where('user_id', auth()->user()->id)->pluck('location')->toArray();
+            foreach ($winnings as $winning) {
+                if (count(array_intersect($winning, $takesByUser)) == 3) {
+                    $game->update([
+                        'winner' => auth()->user()->id
+                    ]);
+                    $winner = auth()->user()->name;
+                    
+                    return response()->json($winner);
+                }
+            }
+        }
         return new GameResource($game);
     }
     

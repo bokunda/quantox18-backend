@@ -10,7 +10,8 @@ class Game extends Model
     
     protected $fillable = [
         'started',
-        'user_two_accepted'
+        'user_two_accepted',
+        'winner'
     ];
     
     public function takes()
