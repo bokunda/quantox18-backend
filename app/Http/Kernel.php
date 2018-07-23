@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\Cors;
 use App\Http\Middleware\JWT;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -60,5 +61,6 @@ class Kernel extends HttpKernel
         'signed'        => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle'      => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'jwt'           => JWT::class,
+        'cors'          => Cors::class,
     ];
 }

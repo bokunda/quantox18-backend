@@ -10,6 +10,6 @@ class Game extends Model
     
     public function takes()
     {
-        return $this->belongsTo(Game::class, 'game_id');
+        return $this->belongsTo(Takes::class, 'id');
     }
 }
