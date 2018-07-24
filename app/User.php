@@ -55,44 +55,37 @@ class User extends Authenticatable implements JWTSubject
     }
     
     /**
-     * @param $game_id
-     * @return bool
-     */
-    public function canPlay($game_id)
-    {
-        $take = Takes::where('game_id', $game_id)->orderBy('id', 'desc')->first();
-        $game = Game::find($game_id);
-        
-        if ($take != null) {
-            if ($take->next_turn == $this->id) {
-                return true;
-            }
-            return false;
-        }
-        
-        if ($game->user_one != $this->id) {
-            return false;
-        }
-        
-        return true;
-    }
-    
-    /**
      * @param $location
      * @param $game_id
      * @return bool
      */
-    public function takeExists($location, $game_id)
+    public function canPlay($location, $game_id)
     {
-        $take = Takes::where('game_id', $game_id)->pluck('location')->toArray();
+        $take = Takes::where('game_id', $game_id)->orderBy('id', 'desc')->get();
         
-        if (in_array($location, $take)) {
+        $game = Game::find($game_id);
+        
+        if (in_array($location, $take->pluck('location')->toArray())) {
             return false;
         }
         
-        if ($location > 9) {
+        if (count($take->pluck('location')->toArray()) > 9) {
             return false;
         }
+        
+        if ($take->first() == null) {
+            if ($game->user_one != $this->id) {
+                return false;
+            }
+        }
+        
+        if ($take->first() != null) {
+            if ($take->first()->next_turn != $this->id) {
+                return false;
+            }
+            return true;
+        }
+        
         return true;
     }
 }

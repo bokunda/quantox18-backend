@@ -149,7 +149,7 @@ class GameService
             '2' => $game->user_two
         ];
         
-        if ($user->canPlay($game_id)) {
+        if ($user->canPlay($request->location, $game_id)) {
             $key = array_search($user->id, $users);
             
             unset($users[$key]);
@@ -159,29 +159,24 @@ class GameService
             } else {
                 $next = $users[2];
             }
-            if ($user->takeExists($request->location, $game_id)) {
-                $take = new Takes();
-                
-                $take->game_id   = $game_id;
-                $take->user_id   = $user->id;
-                $take->location  = $request->location;
-                $take->next_turn = $next;
-                $take->save();
-    
-                broadcast(new TakeEvent($take))->toOthers();
-                
-                return fractal()
-                    ->item($game)
-                    ->parseIncludes(['takes', 'winners'])
-                    ->transformWith(new GameTransformer())
-                    ->toArray();
-            }
-            return response()->json([
-                'data' => 'That take already exists.',
-            ]);
+            $take = new Takes();
+            
+            $take->game_id   = $game_id;
+            $take->user_id   = $user->id;
+            $take->location  = $request->location;
+            $take->next_turn = $next;
+            $take->save();
+            
+            broadcast(new TakeEvent($take))->toOthers();
+            
+            return fractal()
+                ->item($game)
+                ->parseIncludes(['takes', 'winners'])
+                ->transformWith(new GameTransformer())
+                ->toArray();
         }
         return response()->json([
-            'data' => 'It\'s not your turn!',
+            'data' => 'It\'s not your turn, or take already exists.',
         ]);
     }
 }
