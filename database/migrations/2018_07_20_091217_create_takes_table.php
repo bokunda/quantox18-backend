@@ -16,7 +16,7 @@ class CreateTakesTable extends Migration
         Schema::create('takes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('game_id');
-            $table->integer('user_id');
+            $table->unsignedInteger('user_id');
             $table->integer('location');
             $table->integer('next_turn');
             
