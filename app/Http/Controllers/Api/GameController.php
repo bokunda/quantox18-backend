@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\GameResource;
 use App\Http\Resources\TakeResource;
 use App\Takes;
+use App\Transformers\GameTransformer;
+use App\Transformers\TakesTransformer;
 use Illuminate\Http\Request;
 
 class GameController extends Controller
@@ -14,22 +16,26 @@ class GameController extends Controller
     public function index()
     {
         $games = Game::all();
-        
-        return GameResource::collection($games);
+    
+        return fractal()
+            ->collection($games)
+            ->parseIncludes(['user_one', 'user_two'])
+            ->transformWith(new GameTransformer())
+            ->toArray();
     }
     
     public function game($game_id)
     {
         $game = Game::find($game_id);
         if ($game->takes->count() == 9) {
-            $winnings = [
-              [1,2,3],
-              [4,5,6],
-              [7,8,9],
-              [1,4,7],
-              [3,6,9],
-              [1,5,9],
-              [7,5,3],
+            $winnings    = [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+                [1, 4, 7],
+                [3, 6, 9],
+                [1, 5, 9],
+                [7, 5, 3],
             ];
             $takesByUser = $game->takes()->where('user_id', auth()->user()->id)->pluck('location')->toArray();
             foreach ($winnings as $winning) {
@@ -37,13 +43,19 @@ class GameController extends Controller
                     $game->update([
                         'winner' => auth()->user()->id
                     ]);
-                    $winner = auth()->user()->name;
-                    
-                    return response()->json($winner);
+                    return fractal()
+                        ->item($game)
+                        ->parseIncludes(['takes', 'winners'])
+                        ->transformWith(new GameTransformer())
+                        ->toArray();
                 }
             }
         }
-        return new GameResource($game);
+        return fractal()
+            ->item($game)
+            ->parseIncludes('takes')
+            ->transformWith(new GameTransformer())
+            ->toArray();
     }
     
     public function create(Request $request, $user_id)
@@ -53,6 +65,12 @@ class GameController extends Controller
             $game->user_one = $request->user()->id;
             $game->user_two = $user_id;
             $game->save();
+    
+            return fractal()
+                ->item($game)
+                ->parseIncludes(['user_one', 'user_two'])
+                ->transformWith(new GameTransformer())
+                ->toArray();
         }
     }
     
@@ -63,12 +81,17 @@ class GameController extends Controller
             'started'           => 1,
             'user_two_accepted' => 1
         ]);
+        return fractal()
+            ->item($game)
+            ->parseIncludes(['user_two'])
+            ->transformWith(new GameTransformer())
+            ->toArray();
     }
     
     public function take(Request $request, $game_id)
     {
-        $user  = $request->user();
-        $game     = Game::find($game_id);
+        $user = $request->user();
+        $game = Game::find($game_id);
         
         $users = [
             '1' => $game->user_one,
@@ -86,15 +109,19 @@ class GameController extends Controller
                 $next = $users[2];
             }
             if ($user->takeExists($request->location, $game_id)) {
-                $takes = new Takes();
-    
-                $takes->game_id   = $game_id;
-                $takes->user_id   = $user->id;
-                $takes->location  = $request->location;
-                $takes->next_turn = $next;
-                $takes->save();
+                $take = new Takes();
                 
-                return new TakeResource($takes);
+                $take->game_id   = $game_id;
+                $take->user_id   = $user->id;
+                $take->location  = $request->location;
+                $take->next_turn = $next;
+                $take->save();
+    
+                return fractal()
+                    ->item($take)
+                    ->parseIncludes(['takes', 'winners'])
+                    ->transformWith(new GameTransformer())
+                    ->toArray();
             }
             return response()->json([
                 'data' => 'That take already exists.',

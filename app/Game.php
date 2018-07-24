@@ -18,4 +18,18 @@ class Game extends Model
     {
         return $this->belongsToMany(User::class, 'takes')->withPivot('location', 'next_turn');
     }
+    
+    public function winners()
+    {
+        return $this->belongsTo(User::class, 'id');
+    }
+    
+    public function userOne()
+    {
+        return $this->belongsToMany(User::class, 'games', 'id', 'user_one');
+    }
+    public function userTwo()
+    {
+        return $this->belongsToMany(User::class, 'games', 'id', 'user_two');
+    }
 }
