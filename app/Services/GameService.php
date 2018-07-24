@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Events\TakeEvent;
+use App\Challenge;
 use App\Game;
 use App\Takes;
+use App\Transformers\ChallengeTransformer;
 use App\Transformers\GameTransformer;
 
 /**
@@ -13,9 +15,6 @@ use App\Transformers\GameTransformer;
  */
 class GameService
 {
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function index()
     {
         $games = Game::get();
@@ -23,24 +22,23 @@ class GameService
         if (count($games) > 0) {
             return fractal()
                 ->collection($games)
-                ->parseIncludes(['user_one', 'user_two'])
+                ->parseIncludes(['takes', 'winners'])
                 ->transformWith(new GameTransformer())
                 ->toArray();
         }
         return response()->json([
-            'data' => 'No games found',
+            'data' => 'No challenges found',
         ]);
     }
-    
     /**
-     * @param $game_id
+     * @param $challenge_id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function game($game_id)
+    public function game($challenge_id)
     {
-        $game = Game::find($game_id);
-        if ($game) {
-            if ($game->takes->count() == 9) {
+        $challenge = Challenge::find($challenge_id);
+        if ($challenge) {
+            if ($challenge->takes->count() == 9) {
                 $winnings    = [
                     [1, 2, 3],
                     [4, 5, 6],
@@ -50,14 +48,14 @@ class GameService
                     [1, 5, 9],
                     [7, 5, 3],
                 ];
-                $takesByUser = $game->takes()->where('user_id', auth()->user()->id)->pluck('location')->toArray();
+                $takesByUser = $challenge->takes()->where('user_id', auth()->user()->id)->pluck('location')->toArray();
                 foreach ($winnings as $winning) {
                     if (count(array_intersect($winning, $takesByUser)) == 3) {
-                        $game->update([
+                        $challenge->update([
                             'winner' => auth()->user()->id
                         ]);
                         return fractal()
-                            ->item($game)
+                            ->item($challenge)
                             ->parseIncludes(['takes', 'winners'])
                             ->transformWith(new GameTransformer())
                             ->toArray();
@@ -65,7 +63,7 @@ class GameService
                 }
             }
             return fractal()
-                ->item($game)
+                ->item($challenge)
                 ->parseIncludes('takes')
                 ->transformWith(new GameTransformer())
                 ->toArray();
@@ -80,76 +78,46 @@ class GameService
      * @param $user_id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create($request, $user_id)
+    public function create($challenge_id)
     {
-        if ($request->user()->id != $user_id) {
-            $game           = new Game();
-            $game->user_one = $request->user()->id;
-            $game->user_two = $user_id;
-            $game->save();
-            
-            return fractal()
-                ->item($game)
-                ->parseIncludes(['user_one', 'user_two'])
-                ->transformWith(new GameTransformer())
-                ->toArray();
-        }
-        return response()->json([
-            'data' => 'You cannot play with yourself.',
-        ]);
-    }
+        $game = new Game();
+        
+        $game->challenge_id = $challenge_id;
+        $game->started      = 1;
+        
+        $game->save();
     
-    /**
-     * @param $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function accept($request)
-    {
-        $game = Game::where('user_two', $request->user()->id)->first();
-        if (!$game) {
-            return response()->json([
-                'data' => 'Only user two can accept game.'
-            ]);
-        }
-        if ($game->user_two_accepted != 0) {
-            return response()->json([
-                'data' => 'You already accepted to play.'
-            ]);
-        }
-        $game->update([
-            'started'           => 1,
-            'user_two_accepted' => 1
-        ]);
-        return fractal()
+        $fractal = fractal()
             ->item($game)
-            ->parseIncludes(['user_two'])
+            ->parseIncludes('challenge')
             ->transformWith(new GameTransformer())
             ->toArray();
         
+        return $fractal;
     }
     
     /**
      * @param $request
-     * @param $game_id
+     * @param $challenge_id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function take($request, $game_id)
+    public function take($request, $challenge_id)
     {
-        $user = $request->user();
-        $game = Game::find($game_id);
+        $user      = $request->user();
+        $challenge = Challenge::find($challenge_id);
         
-        if (!$game) {
+        if (!$challenge) {
             return response()->json([
-                'data' => "Game does not exists."
+                'data' => "Challenge does not exists."
             ]);
         }
         
         $users = [
-            '1' => $game->user_one,
-            '2' => $game->user_two
+            '1' => $challenge->user_one,
+            '2' => $challenge->user_two
         ];
         
-        if ($user->canPlay($request->location, $game_id)) {
+        if ($user->canPlay($request->location, $challenge_id)) {
             $key = array_search($user->id, $users);
             
             unset($users[$key]);
@@ -161,7 +129,7 @@ class GameService
             }
             $take = new Takes();
             
-            $take->game_id   = $game_id;
+            $take->game_id   = $challenge_id;
             $take->user_id   = $user->id;
             $take->location  = $request->location;
             $take->next_turn = $next;
@@ -170,7 +138,7 @@ class GameService
             broadcast(new TakeEvent($take))->toOthers();
             
             return fractal()
-                ->item($game)
+                ->item($challenge)
                 ->parseIncludes(['takes', 'winners'])
                 ->transformWith(new GameTransformer())
                 ->toArray();

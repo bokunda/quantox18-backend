@@ -8,6 +8,7 @@
 
 namespace App\Transformers;
 
+use App\Challenge;
 use App\Game;
 
 /**
@@ -22,12 +23,11 @@ class GameTransformer extends \League\Fractal\TransformerAbstract
     protected $availableIncludes = [
         'takes',
         'winners',
-        'user_one',
-        'user_two',
+        'challenge'
     ];
     
     /**
-     * @param Game $game
+     * @param Challenge $challenge
      * @return array
      */
     public function transform(Game $game)
@@ -39,7 +39,7 @@ class GameTransformer extends \League\Fractal\TransformerAbstract
     }
     
     /**
-     * @param Game $game
+     * @param Challenge $challenge
      * @return \League\Fractal\Resource\Collection
      */
     public function includeTakes(Game $game)
@@ -48,7 +48,7 @@ class GameTransformer extends \League\Fractal\TransformerAbstract
     }
     
     /**
-     * @param Game $game
+     * @param Challenge $challenge
      * @return \League\Fractal\Resource\Item
      */
     public function includeWinners(Game $game)
@@ -56,21 +56,9 @@ class GameTransformer extends \League\Fractal\TransformerAbstract
         return $this->item($game->winners, new WinnerTransformer());
     }
     
-    /**
-     * @param Game $game
-     * @return \League\Fractal\Resource\Collection
-     */
-    public function includeUserOne(Game $game)
+    public function includeChallenge(Game $game)
     {
-        return $this->collection($game->userOne, new UserTransformer());
+        return $this->item($game->challenge, new ChallengeTransformer());
     }
     
-    /**
-     * @param Game $game
-     * @return \League\Fractal\Resource\Collection
-     */
-    public function includeUserTwo(Game $game)
-    {
-        return $this->collection($game->userTwo, new UserTransformer());
-    }
 }

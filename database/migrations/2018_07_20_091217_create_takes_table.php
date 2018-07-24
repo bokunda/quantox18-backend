@@ -34,6 +34,6 @@ class CreateTakesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('game_users');
+        Schema::dropIfExists('takes');
     }
 }

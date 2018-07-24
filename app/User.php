@@ -54,30 +54,38 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
     
+    public function canJoinGame($challengeId)
+    {
+        $challenge = Challenge::find($challengeId);
+        
+        return $challenge->user_one == $this->id || $challenge->user_two == $this->id;
+        
+    }
+    
     /**
      * @param $location
-     * @param $game_id
+     * @param $challenge_id
      * @return bool
      */
-    public function canPlay($location, $game_id)
+    public function canPlay($location, $challenge_id)
     {
-        $game = Game::find($game_id);
-        if (in_array($location, $game->takes()->pluck('location')->toArray())) {
+        $challenge = Challenge::find($challenge_id);
+        if (in_array($location, $challenge->takes()->pluck('location')->toArray())) {
             return false;
         }
         
-        if (count($game->takes()->pluck('location')->toArray()) > 9) {
+        if (count($challenge->takes()->pluck('location')->toArray()) > 9) {
             return false;
         }
         
-        if ($game->takes()->first() == null) {
-            if ($game->user_one != $this->id) {
+        if ($challenge->takes()->first() == null) {
+            if ($challenge->user_one != $this->id) {
                 return false;
             }
         }
         
-        if ($game->takes()->first() != null) {
-            if ($game->takes()->first()->pivot->next_turn != $this->id) {
+        if ($challenge->takes()->first() != null) {
+            if ($challenge->takes()->first()->pivot->next_turn != $this->id) {
                 return false;
             }
             return true;

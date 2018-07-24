@@ -11,9 +11,14 @@
 |
 */
 
-Broadcast::channel('App.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+//Broadcast::channel('App.User.{id}', function ($user, $id) {
+//    return (int) $user->id === (int) $id;
+//});
+
+Broadcast::channel('lobby', function ($user) {
+    return ['user' => $user->name, 'id' => $user->id];
 });
-Broadcast::channel('channel-take.{game_id}', function ($user, $game_id) {
-    return $user->canPlay($game_id);
+
+Broadcast::channel('games.{game_id}', function ($user, $game_id) {
+    return $user->canJoinGame($game_id);
 });
