@@ -61,26 +61,23 @@ class User extends Authenticatable implements JWTSubject
      */
     public function canPlay($location, $game_id)
     {
-        $take = Takes::where('game_id', $game_id)->orderBy('id', 'desc')->get();
-        
         $game = Game::find($game_id);
-        
-        if (in_array($location, $take->pluck('location')->toArray())) {
+        if (in_array($location, $game->takes()->pluck('location')->toArray())) {
             return false;
         }
         
-        if (count($take->pluck('location')->toArray()) > 9) {
+        if (count($game->takes()->pluck('location')->toArray()) > 9) {
             return false;
         }
         
-        if ($take->first() == null) {
+        if ($game->takes()->first() == null) {
             if ($game->user_one != $this->id) {
                 return false;
             }
         }
         
-        if ($take->first() != null) {
-            if ($take->first()->next_turn != $this->id) {
+        if ($game->takes()->first() != null) {
+            if ($game->takes()->first()->pivot->next_turn != $this->id) {
                 return false;
             }
             return true;
