@@ -54,6 +54,10 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
     
+    /**
+     * @param $game_id
+     * @return bool
+     */
     public function canPlay($game_id)
     {
         $take = Takes::where('game_id', $game_id)->orderBy('id', 'desc')->first();
@@ -73,6 +77,11 @@ class User extends Authenticatable implements JWTSubject
         return true;
     }
     
+    /**
+     * @param $location
+     * @param $game_id
+     * @return bool
+     */
     public function takeExists($location, $game_id)
     {
         $take = Takes::where('game_id', $game_id)->pluck('location')->toArray();
