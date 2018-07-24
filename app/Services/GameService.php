@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\TakeEvent;
 use App\Game;
 use App\Takes;
 use App\Transformers\GameTransformer;
@@ -166,6 +167,8 @@ class GameService
                 $take->location  = $request->location;
                 $take->next_turn = $next;
                 $take->save();
+    
+                broadcast(new TakeEvent($take))->toOthers();
                 
                 return fractal()
                     ->item($game)
