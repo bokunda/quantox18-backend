@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\AuthService;
+use App\Services\GameService;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -22,5 +23,9 @@ class Controller extends BaseController
     public function AuthService()
     {
         return new AuthService();
+    }
+    public function GameService()
+    {
+        return new GameService();
     }
 }

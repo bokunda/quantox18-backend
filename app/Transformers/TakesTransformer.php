@@ -10,8 +10,16 @@ namespace App\Transformers;
 
 use App\User;
 
+/**
+ * Class TakesTransformer
+ * @package App\Transformers
+ */
 class TakesTransformer extends \League\Fractal\TransformerAbstract
 {
+    /**
+     * @param User $user
+     * @return array
+     */
     public function transform(User $user)
     {
         return [
