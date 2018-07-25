@@ -138,9 +138,16 @@ class GameService
             
             broadcast(new TakeEvent($take))->toOthers();
             
+            if ($game->checkWinner()) {
+                return fractal()
+                    ->item($game)
+                    ->parseIncludes(['takes', 'winners'])
+                    ->transformWith(new GameTransformer())
+                    ->toArray();
+            }
             return fractal()
                 ->item($game)
-                ->parseIncludes(['takes', 'winners'])
+                ->parseIncludes(['takes'])
                 ->transformWith(new GameTransformer())
                 ->toArray();
         }
