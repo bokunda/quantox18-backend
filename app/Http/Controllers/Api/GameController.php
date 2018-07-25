@@ -11,4 +11,12 @@ class GameController extends Controller
     {
         return $this->GameService()->index();
     }
+    public function game($game_id)
+    {
+        return $this->GameService()->game($game_id);
+    }
+    public function take(Request $request, $game_id)
+    {
+        return $this->GameService()->take($request, $game_id);
+    }
 }

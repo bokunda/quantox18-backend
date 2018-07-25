@@ -23,7 +23,7 @@ class GameTransformer extends \League\Fractal\TransformerAbstract
     protected $availableIncludes = [
         'takes',
         'winners',
-        'challenge'
+        'challenge',
     ];
     
     /**
@@ -39,7 +39,7 @@ class GameTransformer extends \League\Fractal\TransformerAbstract
     }
     
     /**
-     * @param Challenge $challenge
+     * @param Challenge $game
      * @return \League\Fractal\Resource\Collection
      */
     public function includeTakes(Game $game)
@@ -55,7 +55,7 @@ class GameTransformer extends \League\Fractal\TransformerAbstract
     {
         return $this->item($game->winners, new WinnerTransformer());
     }
-    
+
     public function includeChallenge(Game $game)
     {
         return $this->item($game->challenge, new ChallengeTransformer());

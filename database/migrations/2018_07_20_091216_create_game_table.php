@@ -18,6 +18,7 @@ class CreateGameTable extends Migration
             $table->unsignedInteger('challenge_id');
             $table->boolean('started')->default(false);
             $table->unsignedInteger('winner')->nullable();
+            $table->integer('next_turn')->nullable();
             $table->timestamps();
             
             $table->foreign('challenge_id')->references('id')->on('challenges')->onDelete('cascade');

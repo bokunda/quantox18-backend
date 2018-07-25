@@ -67,28 +67,27 @@ class User extends Authenticatable implements JWTSubject
      * @param $challenge_id
      * @return bool
      */
-    public function canPlay($location, $challenge_id)
+    public function canPlay($location, $game_id)
     {
-        $challenge = Challenge::find($challenge_id);
-        if (in_array($location, $challenge->takes()->pluck('location')->toArray())) {
+        $game = Game::find($game_id);
+        if (in_array($location, $game->takes()->pluck('location')->toArray())) {
             return false;
         }
         
-        if (count($challenge->takes()->pluck('location')->toArray()) > 9) {
+        if (count($game->takes()->pluck('location')->toArray()) > 9) {
             return false;
         }
         
-        if ($challenge->takes()->first() == null) {
-            if ($challenge->user_one != $this->id) {
+        if ($game->takes()->first() == null) {
+            if ($game->challenge->user_one != $this->id) {
                 return false;
             }
         }
         
-        if ($challenge->takes()->first() != null) {
-            if ($challenge->takes()->first()->pivot->next_turn != $this->id) {
+        if ($game->takes()->first() != null) {
+            if ($game->takes->first()->pivot->orderBy('id', 'desc')->first()->next_turn != $this->id) {
                 return false;
             }
-            return true;
         }
         
         return true;
