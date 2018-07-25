@@ -24,16 +24,17 @@ class Game extends Model
                 [1, 5, 9],
                 [7, 5, 3],
             ];
+            
             $takesByUser = $this->takes()->where('user_id', auth()->user()->id)->pluck('location')->toArray();
             foreach ($winnings as $winning) {
                 if (count(array_intersect($winning, $takesByUser)) == 3) {
                     $this->update([
                         'winner' => auth()->user()->id,
                     ]);
-                    return true;
+                    return $this;
                 }
             }
-            return false;
+            return $this;
         }
     }
     

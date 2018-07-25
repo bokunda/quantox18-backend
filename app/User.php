@@ -70,6 +70,7 @@ class User extends Authenticatable implements JWTSubject
     public function canPlay($location, $game_id)
     {
         $game = Game::find($game_id);
+        
         if (in_array($location, $game->takes()->pluck('location')->toArray())) {
             return false;
         }

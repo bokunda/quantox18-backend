@@ -30,6 +30,7 @@ class GameService
             'data' => 'No games found',
         ]);
     }
+    
     /**
      * @param $challenge_id
      * @return \Illuminate\Http\JsonResponse
@@ -86,7 +87,7 @@ class GameService
         $game->started      = 1;
         
         $game->save();
-    
+        
         $fractal = fractal()
             ->item($game)
             ->parseIncludes('challenge')
@@ -103,28 +104,21 @@ class GameService
      */
     public function take($request, $game_id)
     {
-        $user      = $request->user();
+        $user = $request->user();
         $game = Game::find($game_id);
         
         if (!$game) {
             return response()->json([
-                'data' => "Challenge does not exists."
+                'data' => "Game does not exists."
             ]);
         }
-        
         $users = [
             '1' => $game->challenge->user_one,
             '2' => $game->challenge->user_two
         ];
-        if ($game->checkWinner()) {
-            return fractal()
-                ->item($game)
-                ->parseIncludes(['takes', 'winners'])
-                ->transformWith(new GameTransformer())
-                ->toArray();
-        }
         
         if ($user->canPlay($request->location, $game_id)) {
+            
             $key = array_search($user->id, $users);
             
             unset($users[$key]);
@@ -146,13 +140,19 @@ class GameService
             
             return fractal()
                 ->item($game)
-                ->parseIncludes(['takes'])
+                ->parseIncludes(['takes', 'winners'])
                 ->transformWith(new GameTransformer())
                 ->toArray();
         }
-        
+        if ($game->checkWinner()) {
+            return fractal()
+                ->item($game)
+                ->parseIncludes(['takes', 'winners'])
+                ->transformWith(new GameTransformer())
+                ->toArray();
+        }
         return response()->json([
-            'data' => 'It\'s not your turn, or take already exists.',
+            'data' => "It's not your turn, or take exists."
         ]);
     }
 }
