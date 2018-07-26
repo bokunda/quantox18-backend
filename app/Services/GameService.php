@@ -20,11 +20,12 @@ class GameService
         $games = Game::get();
         
         if (count($games) > 0) {
-            return fractal()
-                ->collection($games)
-                ->parseIncludes(['challenge'])
-                ->transformWith(new GameTransformer())
-                ->toArray();
+            return $games;
+//            return fractal()
+//                ->collection($games)
+//                ->parseIncludes(['challenge'])
+//                ->transformWith(new GameTransformer())
+//                ->toArray();
         }
         return response()->json([
             'data' => 'No games found',
@@ -55,19 +56,21 @@ class GameService
                         $game->update([
                             'winner' => auth()->user()->id
                         ]);
-                        return fractal()
-                            ->item($game)
-                            ->parseIncludes(['takes', 'winners'])
-                            ->transformWith(new GameTransformer())
-                            ->toArray();
+                        return $game;
+//                        return fractal()
+//                            ->item($game)
+//                            ->parseIncludes(['takes', 'winners'])
+//                            ->transformWith(new GameTransformer())
+//                            ->toArray();
                     }
                 }
             }
-            return fractal()
-                ->item($game)
-                ->parseIncludes('takes')
-                ->transformWith(new GameTransformer())
-                ->toArray();
+            return $game;
+//            return fractal()
+//                ->item($game)
+//                ->parseIncludes('takes')
+//                ->transformWith(new GameTransformer())
+//                ->toArray();
         }
         return response()->json([
             'data' => 'No game found',
@@ -88,13 +91,15 @@ class GameService
         
         $game->save();
         
-        $fractal = fractal()
-            ->item($game)
-            ->parseIncludes('challenge')
-            ->transformWith(new GameTransformer())
-            ->toArray();
+        return $game;
         
-        return $fractal;
+//        $fractal = fractal()
+//            ->item($game)
+//            ->parseIncludes('challenge')
+//            ->transformWith(new GameTransformer())
+//            ->toArray();
+//
+//        return $fractal;
     }
     
     /**
@@ -137,24 +142,28 @@ class GameService
             $take->save();
             
             if ($game->checkWinner()) {
-                return fractal()
-                    ->item($game)
-                    ->parseIncludes(['takes', 'winners'])
-                    ->transformWith(new GameTransformer())
-                    ->toArray();
+                return $game;
+//                return fractal()
+//                    ->item($game)
+//                    ->parseIncludes(['takes', 'winners'])
+//                    ->transformWith(new GameTransformer())
+//                    ->toArray();
             }
-            return fractal()
-                ->item($game)
-                ->parseIncludes(['takes'])
-                ->transformWith(new GameTransformer())
-                ->toArray();
+            return $game;
+//            return fractal()
+//
+//                ->item($game)
+//                ->parseIncludes(['takes'])
+//                ->transformWith(new GameTransformer())
+//                ->toArray();
         }
         if ($game->checkWinner()) {
-            return fractal()
-                ->item($game)
-                ->parseIncludes(['takes', 'winners'])
-                ->transformWith(new GameTransformer())
-                ->toArray();
+            return $game;
+//            return fractal()
+//                ->item($game)
+//                ->parseIncludes(['takes', 'winners'])
+//                ->transformWith(new GameTransformer())
+//                ->toArray();
         }
         return response()->json([
             'data' => "It's not your turn, or take exists."

@@ -35,6 +35,6 @@ class ChallengeEvent
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('challenge.'.$this->challenge->id);
+        return new PresenceChannel('challenge.'.$this->challenge->id);
     }
 }

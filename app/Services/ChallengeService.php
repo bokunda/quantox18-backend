@@ -21,11 +21,12 @@ class ChallengeService
         $challenges = Challenge::get();
         
         if (count($challenges) > 0) {
-            return fractal()
-                ->collection($challenges)
-                ->parseIncludes(['user_one', 'user_two'])
-                ->transformWith(new ChallengeTransformer())
-                ->toArray();
+            return $challenges;
+//            return fractal()
+//                ->collection($challenges)
+//                ->parseIncludes(['user_one', 'user_two'])
+//                ->transformWith(new ChallengeTransformer())
+//                ->toArray();
         }
         return response()->json([
             'data' => 'No challenges found',
@@ -42,11 +43,13 @@ class ChallengeService
         $challenge = Challenge::find($challenge_id);
         
         if ($challenge) {
-            return fractal()
-                ->item($challenge)
-                ->parseIncludes(['user_one', 'user_two'])
-                ->transformWith(new ChallengeTransformer())
-                ->toArray();
+            
+            return $challenge;
+//            return fractal()
+//                ->item($challenge)
+//                ->parseIncludes(['user_one', 'user_two'])
+//                ->transformWith(new ChallengeTransformer())
+//                ->toArray();
         }
         
         return response()->json([
@@ -63,11 +66,13 @@ class ChallengeService
             ->get();
         
         if ($challenge) {
-            return fractal()
-                ->collection($challenge)
-                ->parseIncludes(['user_one', 'user_two'])
-                ->transformWith(new ChallengeTransformer())
-                ->toArray();
+            
+            return $challenge;
+//            return fractal()
+//                ->collection($challenge)
+//                ->parseIncludes(['user_one', 'user_two'])
+//                ->transformWith(new ChallengeTransformer())
+//                ->toArray();
         }
         return response()->json([
             'data' => 'No challenges found',
@@ -87,11 +92,13 @@ class ChallengeService
             $challenge->user_two = $user_id;
             $challenge->save();
             
-            return fractal()
-                ->item($challenge)
-                ->parseIncludes(['user_one', 'user_two'])
-                ->transformWith(new ChallengeTransformer())
-                ->toArray();
+            return $challenge;
+            
+//            return fractal()
+//                ->item($challenge)
+//                ->parseIncludes(['user_one', 'user_two'])
+//                ->transformWith(new ChallengeTransformer())
+//                ->toArray();
         }
         return response()->json([
             'data' => 'You cannot play with yourself.',
