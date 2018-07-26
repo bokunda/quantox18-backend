@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Challenge;
+use App\Events\GameEvent;
 use App\Game;
 use App\Transformers\ChallengeTransformer;
 use App\Transformers\GameTransformer;
@@ -66,7 +67,6 @@ class ChallengeService
             ->get();
         
         if ($challenge) {
-            
             return $challenge;
 //            return fractal()
 //                ->collection($challenge)
@@ -96,7 +96,7 @@ class ChallengeService
             
 //            return fractal()
 //                ->item($challenge)
-//                ->parseIncludes(['user_one', 'user_two'])
+//                ->parseIncludes(['user_one', 'user_two', 'game'])
 //                ->transformWith(new ChallengeTransformer())
 //                ->toArray();
         }
@@ -109,28 +109,38 @@ class ChallengeService
      * @param $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function accept($request, $challenge_id)
+    public function accept($challenge_id, $user_id)
     {
-        $challenge = Challenge::find($challenge_id);
-        
-        if ($challenge->user_two !== $request->user()->id) {
-            return response()->json([
-                'data' => 'Only user two can accept game.'
+//        $challenge = Challenge::find($challenge_id);
+        $challenge = Challenge::where('id', $challenge_id)->where('user_two', $user_id)->first();
+        if ($challenge) {
+            if ($challenge->user_two != $user_id) {
+                return response()->json([
+                    'data' => 'Only user two can accept game.'
+                ]);
+            }
+    
+            if ($challenge->user_two_accepted == 1) {
+                return response()->json([
+                    'data' => 'You already accepted to play.'
+                ]);
+            }
+    
+            $challenge->update([
+                'user_two_accepted' => 1
             ]);
+    
+            $gs = new GameService();
+    
+            $game = $gs->create($challenge_id);
+            
+//            broadcast(new GameEvent($game));
+            
+            return $game;
         }
-        
-        if ($challenge->user_two_accepted == 1) {
-            return response()->json([
-                'data' => 'You already accepted to play.'
-            ]);
-        }
-        
-        $challenge->update([
-            'user_two_accepted' => 1
+        return response()->json([
+            'data' => 'Challenge not found.'
         ]);
-        
-        $gs = new GameService();
-        
-        return $gs->create($challenge_id);
+
     }
 }

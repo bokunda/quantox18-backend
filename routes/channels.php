@@ -11,14 +11,17 @@
 |
 */
 
-//Broadcast::channel('App.User.{id}', function ($user, $id) {
-//    return (int) $user->id === (int) $id;
-//});
+Broadcast::channel('user.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
 
 Broadcast::channel('lobby', function ($user) {
     return ['user' => $user->name, 'id' => $user->id];
 });
 
 Broadcast::channel('challenge.{id}', function ($user) {
+    return true;
+});
+Broadcast::channel('game.{id}', function ($user) {
     return true;
 });

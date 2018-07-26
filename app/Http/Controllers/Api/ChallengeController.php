@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Challenge;
 use App\Events\ChallengeEvent;
+use App\Events\GameEvent;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -38,7 +39,7 @@ class ChallengeController extends Controller
     {
         $challenge = $this->ChallengeService()->myChallenge();
     
-        broadcast(new ChallengeEvent($challenge));
+        
         
         return $challenge;
     }
@@ -52,6 +53,8 @@ class ChallengeController extends Controller
     {
         $challenge = $this->ChallengeService()->create($request, $user_id);
         
+        broadcast(new ChallengeEvent($challenge));
+        
         return $challenge;
     }
     
@@ -59,10 +62,12 @@ class ChallengeController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function accept(Request $request, $challenge_id)
+    public function accept($user_id, $challenge_id)
     {
-        $challenge = $this->ChallengeService()->accept($request, $challenge_id);
+        $game = $this->ChallengeService()->accept($user_id, $challenge_id);
+    
+        broadcast(new GameEvent($game));
         
-        return $challenge;
+        return $game;
     }
 }

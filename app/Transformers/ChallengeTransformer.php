@@ -23,6 +23,7 @@ class ChallengeTransformer extends \League\Fractal\TransformerAbstract
     protected $defaultIncludes = [
         'user_one',
         'user_two',
+        'game'
     ];
     
     /**

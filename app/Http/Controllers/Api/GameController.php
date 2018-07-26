@@ -24,6 +24,8 @@ class GameController extends Controller
     {
         $game = $this->GameService()->take($request, $game_id);
         
+        broadcast(new TakeEvent($game));
+        
         return $game;
     }
 }

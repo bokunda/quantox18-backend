@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\GameEvent;
 use App\Events\TakeEvent;
 use App\Challenge;
 use App\Game;
