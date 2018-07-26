@@ -2,7 +2,9 @@
 
 namespace App\Events;
 
-use App\Takes;
+use App\Challenge;
+use App\Game;
+use App\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -11,20 +13,19 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class TakeEvent
+class ChallengeEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $take;
-    
+    public $challenge;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Takes $take)
+    public function __construct($challenge)
     {
-        $this->take = $take;
+        $this->challenge = $challenge;
     }
 
     /**
@@ -34,6 +35,6 @@ class TakeEvent
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('games.'.$this->take->game_id);
+        return new PrivateChannel('challenge.'.$this->challenge->id);
     }
 }

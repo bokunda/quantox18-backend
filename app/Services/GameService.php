@@ -22,7 +22,7 @@ class GameService
         if (count($games) > 0) {
             return fractal()
                 ->collection($games)
-//                ->parseIncludes(['takes', 'winners'])
+                ->parseIncludes(['challenge'])
                 ->transformWith(new GameTransformer())
                 ->toArray();
         }
@@ -135,8 +135,6 @@ class GameService
             $take->location  = $request->location;
             $take->next_turn = $next;
             $take->save();
-            
-            broadcast(new TakeEvent($take))->toOthers();
             
             if ($game->checkWinner()) {
                 return fractal()

@@ -19,6 +19,6 @@ Broadcast::channel('lobby', function ($user) {
     return ['user' => $user->name, 'id' => $user->id];
 });
 
-Broadcast::channel('games.{game_id}', function ($user, $game_id) {
-    return $user->canJoinGame($game_id);
+Broadcast::channel('challenge.{id}', function ($user) {
+    return true;
 });

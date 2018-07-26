@@ -3,12 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Challenge;
+use App\Events\ChallengeEvent;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\GameResource;
-use App\Http\Resources\TakeResource;
-use App\Takes;
-use App\Transformers\GameTransformer;
-use App\Transformers\TakesTransformer;
 use Illuminate\Http\Request;
 
 /**
@@ -31,7 +27,20 @@ class ChallengeController extends Controller
      */
     public function challenge($challenge_id)
     {
-        return $this->ChallengeService()->challenge($challenge_id);
+        $challenge = $this->ChallengeService()->challenge($challenge_id);
+        
+        broadcast(new ChallengeEvent($challenge));
+        
+        return $challenge;
+    }
+    
+    public function myChallenge()
+    {
+        $challenge = $this->ChallengeService()->myChallenge();
+    
+        broadcast(new ChallengeEvent($challenge));
+        
+        return $challenge;
     }
     
     /**
@@ -42,12 +51,6 @@ class ChallengeController extends Controller
     public function create(Request $request, $user_id)
     {
         $challenge = $this->ChallengeService()->create($request, $user_id);
-    
-//        $user = User::find($user_id);
-//
-//        broadcast(new GameChallengeEvent($user));
-//
-//
         
         return $challenge;
     }
@@ -60,19 +63,6 @@ class ChallengeController extends Controller
     {
         $challenge = $this->ChallengeService()->accept($request, $challenge_id);
         
-//        broadcast(new GameStartedEvent($challenge))->toOthers();
-        
         return $challenge;
-        
-    }
-    
-    /**
-     * @param Request $request
-     * @param $challenge_id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function take(Request $request, $challenge_id)
-    {
-        return $this->GameService()->take($request, $challenge_id);
     }
 }

@@ -59,7 +59,6 @@ class User extends Authenticatable implements JWTSubject
         $challenge = Challenge::find($challengeId);
         
         return $challenge->user_one == $this->id || $challenge->user_two == $this->id;
-        
     }
     
     /**

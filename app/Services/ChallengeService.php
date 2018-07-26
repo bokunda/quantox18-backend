@@ -38,7 +38,9 @@ class ChallengeService
      */
     public function challenge($challenge_id)
     {
+        
         $challenge = Challenge::find($challenge_id);
+        
         if ($challenge) {
             return fractal()
                 ->item($challenge)
@@ -46,15 +48,36 @@ class ChallengeService
                 ->transformWith(new ChallengeTransformer())
                 ->toArray();
         }
+        
         return response()->json([
             'data' => 'No challenge found',
+        ]);
+    }
+    
+    public function myChallenge()
+    {
+        $challenge = Challenge::where(function ($q) {
+            $q->where('user_one', auth()->user()->id)
+                ->orWhere('user_two', auth()->user()->id);
+        })
+            ->get();
+        
+        if ($challenge) {
+            return fractal()
+                ->collection($challenge)
+                ->parseIncludes(['user_one', 'user_two'])
+                ->transformWith(new ChallengeTransformer())
+                ->toArray();
+        }
+        return response()->json([
+            'data' => 'No challenges found',
         ]);
     }
     
     /**
      * @param $request
      * @param $user_id
-     * @return \Illuminate\Http\JsonResponse
+     * @return string
      */
     public function create($request, $user_id)
     {
@@ -94,7 +117,7 @@ class ChallengeService
                 'data' => 'You already accepted to play.'
             ]);
         }
-
+        
         $challenge->update([
             'user_two_accepted' => 1
         ]);

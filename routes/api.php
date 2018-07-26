@@ -25,6 +25,7 @@ Route::group(['prefix' => 'v1'], function () {
         
         Route::group(['prefix' => 'challenges'], function () {
             Route::get('/', 'Api\ChallengeController@index')->name('challenge.index');
+            Route::get('/me', 'Api\ChallengeController@myChallenge')->name('challenge.my');
             Route::get('/{challenge_id}', 'Api\ChallengeController@challenge')->name('challenge.index');
             Route::post('/{user_id}', 'Api\ChallengeController@create')->name('challenge.create');
             Route::patch('/{challenge_id}', 'Api\ChallengeController@accept')->name('challenge.accept');
