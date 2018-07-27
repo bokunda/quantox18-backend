@@ -106,8 +106,9 @@ class ChallengeService
     }
     
     /**
-     * @param $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param $challenge_id
+     * @param $user_id
+     * @return Game|\Illuminate\Http\JsonResponse
      */
     public function accept($challenge_id, $user_id)
     {
@@ -134,13 +135,11 @@ class ChallengeService
     
             $game = $gs->create($challenge_id);
             
-//            broadcast(new GameEvent($game));
-            
             return $game;
         }
         return response()->json([
             'data' => 'Challenge not found.'
         ]);
-
+        
     }
 }

@@ -59,13 +59,14 @@ class ChallengeController extends Controller
     }
     
     /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param $user_id
+     * @param $challenge_id
+     * @return mixed
      */
     public function accept($user_id, $challenge_id)
     {
         $game = $this->ChallengeService()->accept($user_id, $challenge_id);
-    
+        
         broadcast(new GameEvent($game));
         
         return $game;

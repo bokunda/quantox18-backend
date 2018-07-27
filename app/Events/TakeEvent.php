@@ -10,7 +10,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class TakeEvent
+class TakeEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     
@@ -33,6 +33,6 @@ class TakeEvent
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('game.' . $this->game->id);
+        return new PrivateChannel('game.' . $this->game->game_id);
     }
 }

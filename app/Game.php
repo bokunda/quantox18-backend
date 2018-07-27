@@ -11,11 +11,13 @@ class Game extends Model
     protected $fillable = [
         'winner',
     ];
+
+//    protected $appends = ['location'];
     
     public function checkWinner()
     {
-        if ($this->takes->count() == 9) {
-            $winnings    = [
+//        if ($this->takes->count() == 9) {
+            $winnings = [
                 [1, 2, 3],
                 [4, 5, 6],
                 [7, 8, 9],
@@ -23,6 +25,7 @@ class Game extends Model
                 [3, 6, 9],
                 [1, 5, 9],
                 [7, 5, 3],
+                [2, 5, 8]
             ];
             
             $takesByUser = $this->takes()->where('user_id', auth()->user()->id)->pluck('location')->toArray();
@@ -31,12 +34,17 @@ class Game extends Model
                     $this->update([
                         'winner' => auth()->user()->id,
                     ]);
-                    return $this;
+                    return true;
                 }
             }
-            return $this;
-        }
+            return false;
+//        }
     }
+
+//    public function getLocationAttribute()
+//    {
+//        return $this->takes;
+//    }
     
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany

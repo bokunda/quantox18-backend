@@ -23,4 +23,9 @@ class Takes extends Model
         'user_id',
         'location'
     ];
+    
+    public function game()
+    {
+        return $this->belongsTo(Game::class, 'id');
+    }
 }

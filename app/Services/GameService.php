@@ -6,6 +6,7 @@ use App\Events\GameEvent;
 use App\Events\TakeEvent;
 use App\Challenge;
 use App\Game;
+use App\Http\Resources\GameResource;
 use App\Takes;
 use App\Transformers\ChallengeTransformer;
 use App\Transformers\GameTransformer;
@@ -79,9 +80,8 @@ class GameService
     }
     
     /**
-     * @param $request
-     * @param $user_id
-     * @return \Illuminate\Http\JsonResponse
+     * @param $challenge_id
+     * @return Game
      */
     public function create($challenge_id)
     {
@@ -106,13 +106,13 @@ class GameService
     /**
      * @param $request
      * @param $game_id
-     * @return \Illuminate\Http\JsonResponse
+     * @return Takes|\Illuminate\Http\JsonResponse
      */
     public function take($request, $game_id)
     {
         $user = $request->user();
         $game = Game::find($game_id);
-        
+//        return $game;
         if (!$game) {
             return response()->json([
                 'data' => "Game does not exists."
@@ -124,18 +124,18 @@ class GameService
         ];
         
         if ($user->canPlay($request->location, $game_id)) {
-            
+    
             $key = array_search($user->id, $users);
-            
+    
             unset($users[$key]);
-            
+    
             if (array_key_exists('1', $users)) {
                 $next = $users[1];
             } else {
                 $next = $users[2];
             }
             $take = new Takes();
-            
+    
             $take->game_id   = $game_id;
             $take->user_id   = $user->id;
             $take->location  = $request->location;
@@ -143,31 +143,44 @@ class GameService
             $take->save();
             
             if ($game->checkWinner()) {
-                return $game;
-//                return fractal()
+                $take->winner = $game->checkWinner();
+            }
+            return $take;
+        }
+        return response()->json([
+            'data' => "It's not your turn, or take exists."
+        ]);
+        
+//            return $take;
+
+//            return new GameResource($game);
+            
+//            if ($game->checkWinner()) {
+////                return $game;
+//                $game = fractal()
 //                    ->item($game)
 //                    ->parseIncludes(['takes', 'winners'])
 //                    ->transformWith(new GameTransformer())
 //                    ->toArray();
-            }
-            return $game;
-//            return fractal()
+//                return $game;
+//            }
+////            return $game;
+//            $game = fractal()
 //
 //                ->item($game)
 //                ->parseIncludes(['takes'])
 //                ->transformWith(new GameTransformer())
 //                ->toArray();
-        }
-        if ($game->checkWinner()) {
-            return $game;
-//            return fractal()
+//            return $game;
+//        }
+//        if ($game->checkWinner()) {
+//            return $game;
+//            $game = fractal()
 //                ->item($game)
 //                ->parseIncludes(['takes', 'winners'])
 //                ->transformWith(new GameTransformer())
 //                ->toArray();
-        }
-        return response()->json([
-            'data' => "It's not your turn, or take exists."
-        ]);
+//            return $game;
+//        }
     }
 }

@@ -15,7 +15,8 @@ class GameResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'takes' => $this->takes
+            'game' => $this->game,
+            'takes' => $this->take
         ];
     }
 }
