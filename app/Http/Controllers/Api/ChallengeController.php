@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Challenge;
 use App\Events\ChallengeEvent;
 use App\Events\GameEvent;
 use App\Http\Controllers\Controller;
@@ -38,8 +37,6 @@ class ChallengeController extends Controller
     public function myChallenge()
     {
         $challenge = $this->ChallengeService()->myChallenge();
-    
-        
         
         return $challenge;
     }
@@ -47,7 +44,7 @@ class ChallengeController extends Controller
     /**
      * @param Request $request
      * @param $user_id
-     * @return \Illuminate\Http\JsonResponse
+     * @return string
      */
     public function create(Request $request, $user_id)
     {

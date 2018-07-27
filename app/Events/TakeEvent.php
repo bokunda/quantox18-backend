@@ -33,6 +33,6 @@ class TakeEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('game.' . $this->game->game_id);
+        return new PrivateChannel('game.' . $this->game->id);
     }
 }

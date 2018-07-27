@@ -2,14 +2,9 @@
 
 namespace App\Services;
 
-use App\Events\GameEvent;
-use App\Events\TakeEvent;
-use App\Challenge;
+use App\Exceptions\Custom;
 use App\Game;
-use App\Http\Resources\GameResource;
 use App\Takes;
-use App\Transformers\ChallengeTransformer;
-use App\Transformers\GameTransformer;
 
 /**
  * Class AuthService
@@ -17,17 +12,15 @@ use App\Transformers\GameTransformer;
  */
 class GameService
 {
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         $games = Game::get();
         
         if (count($games) > 0) {
             return $games;
-//            return fractal()
-//                ->collection($games)
-//                ->parseIncludes(['challenge'])
-//                ->transformWith(new GameTransformer())
-//                ->toArray();
         }
         return response()->json([
             'data' => 'No games found',
@@ -59,20 +52,10 @@ class GameService
                             'winner' => auth()->user()->id
                         ]);
                         return $game;
-//                        return fractal()
-//                            ->item($game)
-//                            ->parseIncludes(['takes', 'winners'])
-//                            ->transformWith(new GameTransformer())
-//                            ->toArray();
                     }
                 }
             }
             return $game;
-//            return fractal()
-//                ->item($game)
-//                ->parseIncludes('takes')
-//                ->transformWith(new GameTransformer())
-//                ->toArray();
         }
         return response()->json([
             'data' => 'No game found',
@@ -93,94 +76,55 @@ class GameService
         $game->save();
         
         return $game;
-        
-//        $fractal = fractal()
-//            ->item($game)
-//            ->parseIncludes('challenge')
-//            ->transformWith(new GameTransformer())
-//            ->toArray();
-//
-//        return $fractal;
     }
     
     /**
      * @param $request
      * @param $game_id
-     * @return Takes|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse
+     * @throws Custom
      */
     public function take($request, $game_id)
     {
         $user = $request->user();
         $game = Game::find($game_id);
-//        return $game;
         if (!$game) {
             return response()->json([
                 'data' => "Game does not exists."
             ]);
         }
+        
         $users = [
             '1' => $game->challenge->user_one,
             '2' => $game->challenge->user_two
         ];
         
         if ($user->canPlay($request->location, $game_id)) {
-    
+            
             $key = array_search($user->id, $users);
-    
+            
             unset($users[$key]);
-    
+            
             if (array_key_exists('1', $users)) {
                 $next = $users[1];
             } else {
                 $next = $users[2];
             }
             $take = new Takes();
-    
+            
             $take->game_id   = $game_id;
             $take->user_id   = $user->id;
             $take->location  = $request->location;
             $take->next_turn = $next;
             $take->save();
             
-            if ($game->checkWinner()) {
-                $take->winner = $game->checkWinner();
-            }
-            return $take;
-        }
-        return response()->json([
-            'data' => "It's not your turn, or take exists."
-        ]);
-        
-//            return $take;
-
-//            return new GameResource($game);
+            $game->load('takes');
             
-//            if ($game->checkWinner()) {
-////                return $game;
-//                $game = fractal()
-//                    ->item($game)
-//                    ->parseIncludes(['takes', 'winners'])
-//                    ->transformWith(new GameTransformer())
-//                    ->toArray();
-//                return $game;
-//            }
-////            return $game;
-//            $game = fractal()
-//
-//                ->item($game)
-//                ->parseIncludes(['takes'])
-//                ->transformWith(new GameTransformer())
-//                ->toArray();
-//            return $game;
-//        }
-//        if ($game->checkWinner()) {
-//            return $game;
-//            $game = fractal()
-//                ->item($game)
-//                ->parseIncludes(['takes', 'winners'])
-//                ->transformWith(new GameTransformer())
-//                ->toArray();
-//            return $game;
-//        }
+            if ($game->checkWinner()) {
+                $game->load('winners');
+            }
+            
+            return $game;
+        }
     }
 }

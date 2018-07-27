@@ -23,11 +23,6 @@ class ChallengeService
         
         if (count($challenges) > 0) {
             return $challenges;
-//            return fractal()
-//                ->collection($challenges)
-//                ->parseIncludes(['user_one', 'user_two'])
-//                ->transformWith(new ChallengeTransformer())
-//                ->toArray();
         }
         return response()->json([
             'data' => 'No challenges found',
@@ -44,13 +39,7 @@ class ChallengeService
         $challenge = Challenge::find($challenge_id);
         
         if ($challenge) {
-            
             return $challenge;
-//            return fractal()
-//                ->item($challenge)
-//                ->parseIncludes(['user_one', 'user_two'])
-//                ->transformWith(new ChallengeTransformer())
-//                ->toArray();
         }
         
         return response()->json([
@@ -68,11 +57,6 @@ class ChallengeService
         
         if ($challenge) {
             return $challenge;
-//            return fractal()
-//                ->collection($challenge)
-//                ->parseIncludes(['user_one', 'user_two'])
-//                ->transformWith(new ChallengeTransformer())
-//                ->toArray();
         }
         return response()->json([
             'data' => 'No challenges found',
@@ -93,12 +77,6 @@ class ChallengeService
             $challenge->save();
             
             return $challenge;
-            
-//            return fractal()
-//                ->item($challenge)
-//                ->parseIncludes(['user_one', 'user_two', 'game'])
-//                ->transformWith(new ChallengeTransformer())
-//                ->toArray();
         }
         return response()->json([
             'data' => 'You cannot play with yourself.',
@@ -112,7 +90,6 @@ class ChallengeService
      */
     public function accept($challenge_id, $user_id)
     {
-//        $challenge = Challenge::find($challenge_id);
         $challenge = Challenge::where('id', $challenge_id)->where('user_two', $user_id)->first();
         if ($challenge) {
             if ($challenge->user_two != $user_id) {
@@ -120,19 +97,19 @@ class ChallengeService
                     'data' => 'Only user two can accept game.'
                 ]);
             }
-    
+            
             if ($challenge->user_two_accepted == 1) {
                 return response()->json([
                     'data' => 'You already accepted to play.'
                 ]);
             }
-    
+            
             $challenge->update([
                 'user_two_accepted' => 1
             ]);
-    
+            
             $gs = new GameService();
-    
+            
             $game = $gs->create($challenge_id);
             
             return $game;
@@ -140,6 +117,5 @@ class ChallengeService
         return response()->json([
             'data' => 'Challenge not found.'
         ]);
-        
     }
 }

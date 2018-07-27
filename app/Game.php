@@ -4,47 +4,62 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Game
+ * @package App
+ */
 class Game extends Model
 {
+    /**
+     * @var string
+     */
     protected $table = 'games';
     
+    /**
+     * @var array
+     */
     protected $fillable = [
         'winner',
     ];
-
-//    protected $appends = ['location'];
     
+    /**
+     * @return bool
+     */
+    public function draw()
+    {
+        if ($this->takes()->count() == 9 && $this->winner == null) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * @return bool
+     */
     public function checkWinner()
     {
-//        if ($this->takes->count() == 9) {
-            $winnings = [
-                [1, 2, 3],
-                [4, 5, 6],
-                [7, 8, 9],
-                [1, 4, 7],
-                [3, 6, 9],
-                [1, 5, 9],
-                [7, 5, 3],
-                [2, 5, 8]
-            ];
-            
-            $takesByUser = $this->takes()->where('user_id', auth()->user()->id)->pluck('location')->toArray();
-            foreach ($winnings as $winning) {
-                if (count(array_intersect($winning, $takesByUser)) == 3) {
-                    $this->update([
-                        'winner' => auth()->user()->id,
-                    ]);
-                    return true;
-                }
+        $winnings = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [2, 5, 8],
+            [0, 4, 8],
+            [6, 4, 2],
+            [1, 4, 7]
+        ];
+        
+        $takesByUser = $this->takes()->where('user_id', auth()->user()->id)->pluck('location')->toArray();
+        foreach ($winnings as $winning) {
+            if (count(array_intersect($winning, $takesByUser)) == 3) {
+                $this->update([
+                    'winner' => auth()->user()->id,
+                ]);
+                return true;
             }
-            return false;
-//        }
+        }
+        return false;
     }
-
-//    public function getLocationAttribute()
-//    {
-//        return $this->takes;
-//    }
     
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -62,6 +77,9 @@ class Game extends Model
         return $this->belongsTo(User::class, 'winner');
     }
     
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function challenge()
     {
         return $this->belongsTo(Challenge::class, 'challenge_id');

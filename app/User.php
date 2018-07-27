@@ -2,7 +2,7 @@
 
 namespace App;
 
-use http\Env\Request;
+use App\Exceptions\Custom;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -54,6 +54,10 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
     
+    /**
+     * @param $challengeId
+     * @return bool
+     */
     public function canJoinGame($challengeId)
     {
         $challenge = Challenge::find($challengeId);
@@ -63,31 +67,40 @@ class User extends Authenticatable implements JWTSubject
     
     /**
      * @param $location
-     * @param $challenge_id
+     * @param $game_id
      * @return bool
+     * @throws Custom
      */
     public function canPlay($location, $game_id)
     {
         $game = Game::find($game_id);
         
         if (in_array($location, $game->takes()->pluck('location')->toArray())) {
-            return false;
+            throw new Custom('Take already exists', '403');
         }
         
         if (count($game->takes()->pluck('location')->toArray()) > 9) {
-            return false;
+            throw new Custom('The game is over', '403');
         }
         
         if ($game->takes()->first() == null) {
             if ($game->challenge->user_one != $this->id) {
-                return false;
+                throw new Custom('User one play\'s first', '403');
             }
         }
         
         if ($game->takes()->first() != null) {
             if ($game->takes->first()->pivot->orderBy('id', 'desc')->first()->next_turn != $this->id) {
-                return false;
+                throw new Custom('It\'s not your turn', '403');
             }
+        }
+        
+        if ($game->takes()->count() == 9 && $game->winner == null) {
+            throw new Custom('Draw', '403');
+        }
+        
+        if ($game->winner != null) {
+            throw new Custom('We have a winner!', '403');
         }
         
         return true;

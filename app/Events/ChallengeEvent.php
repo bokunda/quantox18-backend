@@ -16,8 +16,9 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 class ChallengeEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
+    
     public $challenge;
+    
     /**
      * Create a new event instance.
      *
@@ -27,7 +28,7 @@ class ChallengeEvent implements ShouldBroadcast
     {
         $this->challenge = $challenge;
     }
-
+    
     /**
      * Get the channels the event should broadcast on.
      *
@@ -35,6 +36,6 @@ class ChallengeEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('user.'.$this->challenge->user_two);
+        return new PrivateChannel('user.' . $this->challenge->user_two);
     }
 }
