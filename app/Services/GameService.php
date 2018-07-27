@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\TakeEvent;
 use App\Exceptions\Custom;
 use App\Game;
 use App\Takes;
@@ -28,38 +29,13 @@ class GameService
     }
     
     /**
-     * @param $challenge_id
-     * @return \Illuminate\Http\JsonResponse
+     * @param $game_id
+     * @return mixed
      */
     public function game($game_id)
     {
-        $game = Game::find($game_id);
-        if ($game) {
-            if ($game->takes->count() == 9) {
-                $winnings    = [
-                    [1, 2, 3],
-                    [4, 5, 6],
-                    [7, 8, 9],
-                    [1, 4, 7],
-                    [3, 6, 9],
-                    [1, 5, 9],
-                    [7, 5, 3],
-                ];
-                $takesByUser = $game->takes()->where('user_id', auth()->user()->id)->pluck('location')->toArray();
-                foreach ($winnings as $winning) {
-                    if (count(array_intersect($winning, $takesByUser)) == 3) {
-                        $game->update([
-                            'winner' => auth()->user()->id
-                        ]);
-                        return $game;
-                    }
-                }
-            }
-            return $game;
-        }
-        return response()->json([
-            'data' => 'No game found',
-        ]);
+        $game = Game::where('id', $game_id)->with('challenge')->first();
+        return $game;
     }
     
     /**
@@ -126,5 +102,18 @@ class GameService
             
             return $game;
         }
+    }
+    
+    public function refresh($game_id) {
+        
+        Takes::where(['game_id' => $game_id])->delete();
+        
+        $game = Game::find($game_id);
+        
+        $game->update([
+            'winner' => null,
+        ]);
+        
+        broadcast(new TakeEvent($game));
     }
 }

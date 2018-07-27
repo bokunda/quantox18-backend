@@ -25,17 +25,6 @@ class Game extends Model
     /**
      * @return bool
      */
-    public function draw()
-    {
-        if ($this->takes()->count() == 9 && $this->winner == null) {
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-     * @return bool
-     */
     public function checkWinner()
     {
         $winnings = [

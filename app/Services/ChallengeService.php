@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Challenge;
 use App\Events\GameEvent;
+use App\Exceptions\Custom;
 use App\Game;
 use App\Transformers\ChallengeTransformer;
 use App\Transformers\GameTransformer;
@@ -66,7 +67,8 @@ class ChallengeService
     /**
      * @param $request
      * @param $user_id
-     * @return string
+     * @return Challenge
+     * @throws Custom
      */
     public function create($request, $user_id)
     {
@@ -78,30 +80,26 @@ class ChallengeService
             
             return $challenge;
         }
-        return response()->json([
-            'data' => 'You cannot play with yourself.',
-        ]);
+        throw new Custom('You cannot play with yourself.', '403');
     }
     
     /**
      * @param $challenge_id
      * @param $user_id
-     * @return Game|\Illuminate\Http\JsonResponse
+     * @return Game
+     * @throws Custom
      */
     public function accept($challenge_id, $user_id)
     {
         $challenge = Challenge::where('id', $challenge_id)->where('user_two', $user_id)->first();
         if ($challenge) {
-            if ($challenge->user_two != $user_id) {
-                return response()->json([
-                    'data' => 'Only user two can accept game.'
-                ]);
+            if ($challenge->user_two != auth()->user()->id) {
+                throw new Custom('User two needs to accept challenge.', '403');
             }
             
             if ($challenge->user_two_accepted == 1) {
-                return response()->json([
-                    'data' => 'You already accepted to play.'
-                ]);
+                throw new Custom('You already accepted challenge.', '403');
+
             }
             
             $challenge->update([
@@ -114,8 +112,6 @@ class ChallengeService
             
             return $game;
         }
-        return response()->json([
-            'data' => 'Challenge not found.'
-        ]);
+        throw new Custom('Challenge not found.', '403');
     }
 }

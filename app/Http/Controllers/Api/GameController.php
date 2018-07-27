@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\GameStartedEvent;
 use App\Events\TakeEvent;
+use App\Takes;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -45,5 +46,13 @@ class GameController extends Controller
         broadcast(new TakeEvent($game));
         
         return $game;
+    }
+    
+    public function refresh($game_id)
+    {
+        $takes = $this->GameService()->refresh($game_id);
+        
+        return $takes;
+        
     }
 }

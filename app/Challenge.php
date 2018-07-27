@@ -23,6 +23,12 @@ class Challenge extends Model
         'user_two_accepted',
         'winner'
     ];
+    
+    /**
+     * @var array
+     */
+    protected $with = ['userOne', 'userTwo'];
+    
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */

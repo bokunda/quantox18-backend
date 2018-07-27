@@ -39,5 +39,9 @@ Route::group(['prefix' => 'v1'], function () {
             Route::patch('/{game_id}', 'Api\GameController@accept')->name('game.accept');
             Route::post('/{game_id}/take', 'Api\GameController@take')->name('game.take');
         });
+    
+        Route::group(['prefix' => 'takes'], function () {
+            Route::delete('/{game_id}', 'Api\GameController@refresh')->name('game.refresh');
+        });
     });
 });
